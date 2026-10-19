@@ -66,18 +66,12 @@ public class SocketHandler implements Runnable{
                     break;
                     
                     case "QUIT":
-                    
-                    break;
+                        return;
                 
                     default:
                         break;
                 }
-            }
-
-            
-
-
-            
+            } 
         } catch (Exception e) {
             // TODO: handle exception
         }
