@@ -67,7 +67,7 @@ public class SocketHandler implements Runnable{
                         String parti[] = acquisto.split(" ", 2);
 
                         synchronized (lock) {
-                            if(parti[0].toLowerCase() != "gold" && parti[0].toLowerCase() != "pit" && parti[0].toLowerCase() != "parterre"){
+                            if(!parti[0].toLowerCase().equals("gold") && !parti[0].toLowerCase().equals("pit") && !parti[0].toLowerCase().equals("parterre")){
                                 out.println("ERR UNKNOWNTYPE --> tipologia inserita non esistente o mancante");
                             } else {
                                 if(parti.length == 1)
