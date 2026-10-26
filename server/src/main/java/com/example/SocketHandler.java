@@ -9,8 +9,9 @@ import java.util.HashMap;
 
 public class SocketHandler implements Runnable{
     private final Socket s;
-    private HashMap<String, Integer> mappaBiglietti = new HashMap<>();
+    private static HashMap<String, Integer> mappaBiglietti = new HashMap<>();
     private static ArrayList<String> arrayUsers = new ArrayList<>();
+    private final Object lock = new Object();
     
     public SocketHandler(Socket s) {
         this.s = s;
@@ -40,9 +41,9 @@ public class SocketHandler implements Runnable{
                 user = in.readLine();
 
                 if(arrayUsers.contains(user)){
-                    out.println("ERR: username già in uso");
+                    out.println("ERR --> username già in uso");
                 } else {
-                    out.println("OK: login effettuato");
+                    out.println("OK --> login effettuato");
                     arrayUsers.add(user);
                     var = false;
                 }
@@ -65,18 +66,34 @@ public class SocketHandler implements Runnable{
                         String acquisto = in.readLine();
                         String parti[] = acquisto.split(" ", 2);
 
-                        if(mappaBiglietti.get(parti[0]) >= Integer.parseInt(parti[1])){
-                            mappaBiglietti.put(parti[0], mappaBiglietti.get(parti[0]) - Integer.parseInt(parti[1]));
-                            out.println("Hai acquistato: " + parti[1] + " biglitti di tipo " + parti[0]);
-                        } else {
-                            out.println("");
+                        synchronized (lock) {
+                            if(parti[0].toLowerCase() != "gold" && parti[0].toLowerCase() != "pit" && parti[0].toLowerCase() != "parterre"){
+                                out.println("ERR UNKNOWNTYPE --> tipologia inserita non esistente o mancante");
+                            } else {
+                                if(parti.length == 1)
+                                    parti[1] = "1";
+                    
+                                try {
+                                    if(mappaBiglietti.get(parti[0]) >= Integer.parseInt(parti[1])){
+                                        mappaBiglietti.put(parti[0], mappaBiglietti.get(parti[0]) - Integer.parseInt(parti[1]));
+                                        out.println("OK --> hai acquistato: " + parti[1] + " biglitti di tipo " + parti[0]);
+                                    } else {
+                                        out.println("KO --> non sono rimasti abbastanza biglietti");
+                                    }
+                                } catch (Exception e) {
+                                    out.println("ERR SYNTAX --> la quantità numerica inserita è incorretta");
+                                }
+                            }
                         }
+                        
                     break;
                     
                     case "QUIT":
+                        out.println("BYE");
                         return;
                 
                     default:
+                        out.println("ERR UNKNOWNCMD --> comando inserito sconosciuto");
                         break;
                 }
             } 
