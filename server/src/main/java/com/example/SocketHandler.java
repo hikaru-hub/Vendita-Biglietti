@@ -62,7 +62,15 @@ public class SocketHandler implements Runnable{
                     break;
 
                     case "BUY":
-                        
+                        String acquisto = in.readLine();
+                        String parti[] = acquisto.split(" ", 2);
+
+                        if(mappaBiglietti.get(parti[0]) >= Integer.parseInt(parti[1])){
+                            mappaBiglietti.put(parti[0], mappaBiglietti.get(parti[0]) - Integer.parseInt(parti[1]));
+                            out.println("Hai acquistato: " + parti[1] + " biglitti di tipo " + parti[0]);
+                        } else {
+                            out.println("");
+                        }
                     break;
                     
                     case "QUIT":
